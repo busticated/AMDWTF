@@ -1,33 +1,33 @@
-define( [ 'jquery', 'mods/crazydot' ], function( $, CrazyDot ){
-    var dots = [];
+define( [ 'jquery', 'mods/ball' ], function( $, Ball ){
+    var balls = [];
 
     var setup = function( cfg ){
-        while ( dots.length < cfg.count ){
-            dots.push( new CrazyDot( cfg.speed, 'body' ).move() );
+        while ( balls.length < cfg.count ){
+            balls.push( new Ball( cfg.speed, cfg.container ).move() );
         }
     };
 
     var stopGame = function(){
-        eachDot(function( dot ){
-            dot.stop();
+        eachBall(function( ball ){
+            ball.stop();
         });
     };
 
     var startGame = function(){
-        eachDot(function( dot ){
-            dot.start();
+        eachBall(function( ball ){
+            ball.start();
         });
     };
 
     var setSpeed = function( spd ){
-        eachDot(function( dot ){
-            dot.speed = spd;
+        eachBall(function( ball ){
+            ball.speed = spd;
         });
     };
 
-    var eachDot = function( callback, ctx ){
-        for ( var i = 0, l = dots.length; i < l; i += 1 ){
-            callback.call( ctx, dots[ i ], i );
+    var eachBall = function( callback, ctx ){
+        for ( var i = 0, l = balls.length; i < l; i += 1 ){
+            callback.call( ctx, balls[ i ], i );
         }
     };
 

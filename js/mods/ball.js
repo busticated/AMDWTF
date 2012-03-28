@@ -1,18 +1,18 @@
 define( [ 'jquery' ], function( $ ){
-    var dotCount = 0;
+    var ballCount = 0;
 
-    var CrazyDot = function ( speed, target ){
+    var Ball = function ( speed, target ){
             var self = this;
 
-            dotCount += 1;
+            ballCount += 1;
 
             this.speed = speed;
-            this.$dot = $('<div class="dot">' + dotCount + '</div>').appendTo( target );
-            this.width = this.$dot.outerWidth(true);
-            this.height = this.$dot.outerHeight(true);
+            this.$ball = $('<div class="ball">' + ballCount + '</div>').appendTo( target );
+            this.width = this.$ball.outerWidth(true);
+            this.height = this.$ball.outerHeight(true);
 
             //click handler
-            this.$dot.click(function() {
+            this.$ball.click(function() {
                 if (!self.isPaused){
                     self.stop();
                 } else {
@@ -21,17 +21,17 @@ define( [ 'jquery' ], function( $ ){
             });
         };
 
-    CrazyDot.prototype = {
+    Ball.prototype = {
         isPaused : false,
         start : function start(){
             this.isPaused = false;
-            this.$dot.removeClass('is-paused');
+            this.$ball.removeClass('is-paused');
             this.move();
             return this;
         },
         stop : function(){
             this.isPaused = true;
-            this.$dot.addClass('is-paused');
+            this.$ball.addClass('is-paused');
             return this;
         },
         move : function move(){
@@ -39,7 +39,7 @@ define( [ 'jquery' ], function( $ ){
                 maxY = $(document).height(),
                 self = this;
 
-            this.$dot.animate({
+            this.$ball.animate({
                     top: Math.floor(Math.random() * ( (maxY - this.height) - 0 + 1)) + 0,
                     left: Math.floor(Math.random() * ( (maxX - this.width) - 0 + 1)) + 0
                 },
@@ -54,5 +54,5 @@ define( [ 'jquery' ], function( $ ){
     };
 
     // public api /////////////////////////////////////////////////////////////
-    return CrazyDot;
+    return Ball;
 });
