@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>Crazy dots! - jsFiddle demo by busticated</title>
+  <title>Balls! - demo by busticated</title>
 
   <style type="text/css">
     body {
@@ -64,21 +64,40 @@
     .controls a:hover {
         color: #fff;
         text-decoration: none;
-    }
+	}
+	.dialog {
+		position: fixed;
+		bottom: 20px;
+		left: 100px;
+		background: #333;
+		border-radius: 5px;
+		box-shadow: 0 0 5px rgba(0,0,0,0.7);
+		padding: 10px;
+		z-index: 9999;
+		pointer-events: none;
+		opacity: 0;
+		-webkit-transition: opacity 0.5s ease;
+	}
+	.is-open {
+		opacity: 1;
+	}
   </style>
 </head>
 <body>
-    <div id="js-controls" class="controls">
-        <span>+</span>
-        <ul>
-            <li><a href="#stop" class="control">stop</a></li>
-            <li><a href="#start" class="control">start</a></li>
-            <li><a href="#halfspeed" class="control">slow</a></li>
-            <li><a href="#fullspeed" class="control">normal</a></li>
-            <li><a href="#dblspeed" class="control">fast</a></li>
-
-        </ul>
-    </div>
+	<div id="js-controls" class="controls">
+		<span>+</span>
+		<ul>
+			<li><a href="#stop" class="control">stop</a></li>
+			<li><a href="#start" class="control">start</a></li>
+			<li><a href="#halfspeed" class="control">slow</a></li>
+			<li><a href="#fullspeed" class="control">normal</a></li>
+			<li><a href="#dblspeed" class="control">fast</a></li>
+			<li><a href="#add" class="control">add</a></li>
+		</ul>
+		<div class="dialog">
+			<input id="js-ballcount" type="number" name="count" />
+		</div>
+	</div>
 <script data-main="js/main" src="http://cdnjs.cloudflare.com/ajax/libs/require.js/1.0.7/require.min.js"></script>
 </body>
 </html>
