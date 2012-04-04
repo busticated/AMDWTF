@@ -17,6 +17,7 @@ require( [ 'jquery', 'mods/arena', 'mods/configs' ], function( $, arena, configs
 
         $('#js-controls').on( 'click', '.control', function( e ){
             e.preventDefault();
+            e.stopPropagation();
             switch ( e.currentTarget.hash.replace( '#', '' ) ){
                 case 'stop':
                     arena.stopGame();
@@ -40,10 +41,14 @@ require( [ 'jquery', 'mods/arena', 'mods/configs' ], function( $, arena, configs
             }
         });
 
-        $( '#js-ballcount' ).on( 'keydown', function( e ){
-            if ( e.keyCode === 13 ){
-                window.location.search = 'balls=' + $( this ).val();
-            }
-        });
+        $( '#js-ballcount' )
+            .on( 'keydown', function( e ){
+                if ( e.keyCode === 13 ){
+                    window.location.search = 'balls=' + $( this ).val();
+                }
+            })
+            .on( 'focusout', function( e ){
+                $( 'div.dialog' ).removeClass( 'is-open' );
+            });
     });
 });
