@@ -1,0 +1,76 @@
+body {
+  font: normal 14px/1 sans-serif;
+}
+.ball {
+  border: 5px solid transparent;
+  height: 100px;
+  width: 100px;
+  background: rgba(0, 166, 81, 0.8);
+  text-align: center;
+  font: bold 54px/100px sans-serif;
+  color: #ffffff;
+  position: absolute;
+  border-radius: 100px;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.ball:hover {
+  border: 5px solid #333333;
+}
+.is-paused {
+  background: rgba(255, 0, 0, 0.7);
+}
+.controls {
+  position: fixed;
+  bottom: 0;
+  left: 10px;
+  background: #333;
+  border-radius: 5px 5px 0 0;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  z-index: 9999;
+}
+.controls:hover ul {
+  display: block;
+}
+.controls:hover span {
+  display: none;
+}
+.controls span {
+  color: #fff;
+}
+.controls ul {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.controls li {
+  padding: 2px 0;
+}
+.controls a,
+.controls a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+.dialog {
+  position: fixed;
+  bottom: 20px;
+  left: 100px;
+  background: #333;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  -webkit-transition: opacity 0.5s ease;
+}
+.is-open {
+  opacity: 1;
+}
