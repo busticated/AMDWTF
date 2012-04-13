@@ -1,0 +1,96 @@
+<!doctype html>
+<head>
+	<link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-git.css" type="text/css" media="screen">
+
+	<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
+	<script src="../libs/sinon-1.3.2.js"></script>
+	<script src="../libs/require-jquery.js"></script>
+	<script>
+		var baseConfig = {
+				baseUrl: '../',
+				paths: {
+					'jquery' : 'http://code.jquery.com/jquery-latest'
+				}
+			};
+		var idx = 0;
+		var givenABall = function( testCb ){
+			var req = require.config( $.extend( {}, baseConfig, { context: 'req' + ( idx += 1 ) } ) );
+			req( [ 'mods/ball' ], function( Ball ){
+				var clock = sinon.sandbox.useFakeTimers();
+				testCb( Ball, new Ball( 1000, '#qunit-fixture' ), clock );
+				clock.restore();
+				start();
+			});
+		};
+
+		test( 'not running tests under the "file:" protocol', function(){
+			notStrictEqual( window.location.protocol, 'file:' );
+		});
+
+		module( 'New Ball', {
+			teardown: function(){
+				strictEqual( $( '#qunit-fixture' ).find( 'div' ).text(), '1' );
+			}
+		});
+
+		asyncTest( 'able to create new instance of Ball', function(){
+			givenABall( function( Ball, b ){
+				ok( b instanceof Ball );
+				ok( b.$ball.jquery );
+				strictEqual( b.speed, 1000 );
+				equal( typeof b.width, 'number' );
+				equal( typeof b.height, 'number' );
+			});
+		});
+
+		asyncTest( 'ball instance can start', function(){
+			givenABall( function( Ball, b, clock ){
+				var duration = 500;
+
+				b.start();
+				ok( b.$ball.is( ':animated' ) );
+				ok( ! b.isPaused );
+				ok( ! b.$ball.hasClass( 'is-paused' ) );
+				b.stop();
+				clock.tick( duration * 2 );
+			});
+		});
+
+		asyncTest( 'ball instance can stop', function(){
+			givenABall( function( Ball, b, clock ){
+				var duration = 500;
+
+				b.start();
+				clock.tick( duration / 2 );
+				b.stop();
+				clock.tick( duration * 2 );
+
+				ok( ! b.$ball.is( ':animated' ) );
+				ok( b.isPaused );
+				ok( b.$ball.hasClass( 'is-paused' ) );
+			});
+		});
+
+		asyncTest( 'ball instance can move', function(){
+			givenABall( function( Ball, b, clock ){
+				var duration = 500;
+
+				b.move();
+				ok( b.$ball.is( ':animated' ) );
+				ok( ! b.$ball.hasClass( 'is-paused' ) );
+				b.stop();
+				clock.tick( duration * 2 );
+			});
+		});
+	</script>
+</head>
+<body>
+	<h1 id="qunit-header">Ball Module: Test Suite</h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="qunit-fixture">
+	</div>
+</body>
+</html>
