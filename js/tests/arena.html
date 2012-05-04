@@ -5,81 +5,118 @@
 
 	<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
 	<script src="../libs/sinon-1.3.2.js"></script>
-	<script src="../libs/require-jquery.js"></script>
+	<script src="../libs/require.js"></script>
+	<script src="../libs/testing.js"></script>
 	<script>
-		var baseConfig = {
-				baseUrl: '../',
-				paths: {
-					'jquery' : 'http://code.jquery.com/jquery-latest'
-				}
-			};
-		var idx = 0;
-		var withAnArena = function( testCb ){
-			var req = require.config( $.extend( {}, baseConfig, { context: 'req' + ( idx += 1 ) } ) );
-			req( [ 'mods/arena' ], function( arena ){
-				var clock = sinon.sandbox.useFakeTimers();
-				testCb( arena, clock );
-				clock.restore();
-				start();
-			});
-		};
+		QUnit.config.testTimeout = 2000;
 
-		test( 'not running tests under the "file:" protocol', function(){
+		test( 'test are running in a compatible environment', function(){
 			notStrictEqual( window.location.protocol, 'file:' );
 		});
 
-		asyncTest( 'module has the correct methods & properties', function(){
-			var expected = {
+		test( 'module has the correct methods & properties', function(){
+			var req = testing.withRequireContext({ baseUrl: '../'});
+			req.given('mods/arena', function( arena ) {
+				var expected = {
 					setup: 'function',
-					stopGame: 'function',
 					startGame: 'function',
+					stopGame: 'function',
 					setSpeed: 'function'
-				},
-				propertyCount = 0;
+				};
 
-			expect(5);
+				expect(1 + Object.keys( expected ).length);
 
-			withAnArena( function( arena ){
+				strictEqual( Object.keys( arena ).length, Object.keys( expected ).length, 'all methods have been identified' );
+
 				for ( var prop in expected ) {
 					strictEqual( typeof arena[ prop ], expected[ prop ], 'module includes the "' + prop + '" method / property' );
-					if ( arena.hasOwnProperty( prop ) ) {
-						propertyCount += 1;
-					}
 				}
-
-				strictEqual(propertyCount, 4, 'module has the expected number of methods / properties');
 			});
 		});
 
-		asyncTest( 'able to setup arena', function(){
-			var callSig = [],
-				expectedCallSig = [
+		module( 'With a new RequireJS context, sinon sandbox, & a fake Ball module', {
+			setup: function(){
+				var requireConfig = {
+					baseUrl: '../'
+				};
+				testing.setupAndTeardown.setup( requireConfig );
+				testing.fakeBall = {
+					callsToInit: [],
+					speeds: []
+				};
+				testing.req.using( 'mods/ball', function(){
+					return function(){
+						var self = this;
+						self.move = function(){ return self; };
+						self.__getSpeedForTest = function(){ return self.speed };
+
+						testing.fakeBall.callsToInit.push( arguments ); //captures init-time configs
+						testing.fakeBall.speeds.push( self.__getSpeedForTest ); //enable getting instance's speed
+					};
+				});
+
+			},
+			teardown: function(){
+				delete testing.fakeBall;
+				testing.setupAndTeardown.teardown();
+			}
+		});
+
+		test( 'when calling .setup() to configure the arena', function(){
+			var expectedCallSig = [
 					{ "0": 1000, "1": "#qunit-fixture" },
 					{ "0": 1000, "1": "#qunit-fixture" },
 					{ "0": 1000, "1": "#qunit-fixture" }
 				];
 
-			define( 'mods/ball', function(){
-				return function(){
-					callSig.push( arguments );
-					this.move = function(){}
-				};
-			});
-
-			withAnArena( function( arena ){
+			testing.req.given( 'mods/arena', function( arena ) {
 				arena.setup({
 					speed: 1000,
 					container: '#qunit-fixture',
 					count: 3
 				});
 
-				deepEqual( callSig, expectedCallSig );
+				deepEqual( testing.fakeBall.callsToInit, expectedCallSig, 'correct number of balls are created' );
 			});
 		});
 
-		asyncTest( 'able to stop game', function(){
-			withAnArena( function( arena, clock ){
+		test( 'when calling .setSpeed() to change the game\'s speed', 3, function(){
+			var expectedSpeed = 2000;
+
+			var testAllSpeeds = function(){
+				for ( var i = 0; i < testing.fakeBall.speeds.length; i += 1 ){
+					strictEqual( testing.fakeBall.speeds[ i ](), expectedSpeed, 'ball instance has correct speed' );
+				}
+			};
+
+			testing.req.given( 'mods/arena', function( arena ) {
+				arena.setup({
+					speed: 1000,
+					container: '#qunit-fixture',
+					count: 3
+				});
+				arena.setSpeed( expectedSpeed );
+				testAllSpeeds();
+			});
+		});
+
+		module( 'With a new RequireJS context & sinon sandbox', {
+			setup: function(){
+				var requireConfig = {
+					baseUrl: '../'
+				};
+				testing.setupAndTeardown.setup( requireConfig );
+			},
+			teardown: function(){
+				testing.setupAndTeardown.teardown();
+			}
+		});
+
+		test( 'when calling .setup() to start the game', function(){
+			testing.req.given( 'mods/arena', function( arena ) {
 				var $ball;
+
+				testing.sandbox.useFakeTimers();
 
 				arena.setup({
 					speed: 2000,
@@ -89,22 +126,40 @@
 
 				$ball = $( '#qunit-fixture' ).find( 'div.ball' );
 
-				strictEqual( $ball.length, 1 );
-				strictEqual( $ball.text(), '1' );
-				ok( $ball.is( ':animated' ) );
-				ok( ! $ball.hasClass( 'is-paused' ) );
-
-				arena.stopGame();
-				clock.tick( 3000 );
-
-				ok( ! $ball.is( ':animated' ) );
-				ok( $ball.hasClass( 'is-paused' ) );
+				strictEqual( $ball.length, 1, 'correct number of balls are present' );
+				strictEqual( $ball.text(), '1', 'ball instance has the correct label' );
+				ok( $ball.is( ':animated' ), 'ball instance is animated by jQuery' );
+				ok( ! $ball.hasClass( 'is-paused' ), 'markup for ball instance does not include "is-paused" class' );
 			});
 		});
 
-		asyncTest( 'able to start game', function(){
-			withAnArena( function( arena, clock ){
+		test( 'when calling .stopGame() to stop the game', function(){
+			testing.req.given( 'mods/arena', function( arena ) {
+				var $ball;
+
+				testing.sandbox.useFakeTimers();
+
+				arena.setup({
+					speed: 2000,
+					container: '#qunit-fixture',
+					count: 1
+				});
+
+				$ball = $( '#qunit-fixture' ).find( 'div.ball' );
+
+				arena.stopGame();
+				testing.sandbox.clock.tick( 3000 );
+
+				ok( ! $ball.is( ':animated' ), 'ball instance is not being animated by jQuery' );
+				ok( $ball.hasClass( 'is-paused' ), 'markup for ball instance does not include the "is-paused" class' );
+			});
+		});
+
+		test( 'when calling .startGame() to re-start the game', function(){
+			testing.req.given( 'mods/arena', function( arena ) {
 				var $balls;
+
+				testing.sandbox.useFakeTimers();
 
 				arena.setup({
 					speed: 2000,
@@ -112,49 +167,17 @@
 					count: 4
 				});
 				arena.stopGame();
-				clock.tick( 3000 );
+				testing.sandbox.clock.tick( 3000 );
 				arena.startGame()
 
 				$balls = $( '#qunit-fixture' ).find( 'div.ball' );
 
-				strictEqual( $balls.length, 4 );
+				strictEqual( $balls.length, 4, '' );
 
 				$balls.each(function(){
 					ok( $( this ).is( ':animated' ) );
 					ok( ! $( this ).hasClass( 'is-paused' ) );
 				});
-			});
-		});
-
-		asyncTest( 'able to change game speed', 3, function(){
-			var expectedSpeed = 2000,
-				speeds = [];
-
-			var testAllSpeeds = function(){
-				for ( var i = 0; i < speeds.length; i += 1 ){
-					strictEqual( speeds[ i ](), expectedSpeed );
-				}
-			};
-
-			define( 'mods/ball', function(){
-				return function(){
-					var self = this;
-					this.move = function(){ return this; };
-					this.speed = null;
-					this.getSpeedForTest = function(){ return self.speed };
-
-					speeds.push( this.getSpeedForTest );
-				};
-			});
-
-			withAnArena( function( arena ){
-				arena.setup({
-					speed: 1000,
-					container: '#qunit-fixture',
-					count: 3
-				});
-				arena.setSpeed( expectedSpeed );
-				testAllSpeeds();
 			});
 		});
 	</script>

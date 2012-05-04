@@ -6,18 +6,18 @@
 	<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
 	<script src="../libs/sinon-1.3.2.js"></script>
 	<script src="../libs/require-jquery.js"></script>
-	<script src="./resources/testing.js"></script>
+	<script src="../libs/testing.js"></script>
 	<script>
 		QUnit.config.testTimeout = 2000;
 
-		test( 'not running tests under the "file:" protocol', function(){
+		test( 'test are running in a compatible environment', function(){
 			notStrictEqual( window.location.protocol, 'file:' );
 		});
 
-		module( 'New Ball', {
+		module( 'With a new RequireJS context & sinon sandbox:', {
 			setup: function(){
 				testing.setupAndTeardown.setup();
-				//testing.sandbox.useFakeTimers();
+				//testing.sandbox.useFakeTimers(); this causes massive pain, maybe avoid?
 			},
 			teardown: function(){
 				strictEqual( $( '#qunit-fixture' ).find( 'div' ).text(), '1', 'ball markup was added to the page' );
@@ -25,19 +25,19 @@
 			}
 		});
 
-		test( 'able to create new instance of Ball', function(){
+		test( 'When creating a new instance of a Ball', function(){
 			testing.req.given( 'js/mods/ball', function ( Ball ) {
 				var b = new Ball( 1000, '#qunit-fixture' );
 
-				ok( b instanceof Ball );
-				ok( b.$ball.jquery );
-				strictEqual( b.speed, 1000 );
-				equal( typeof b.width, 'number' );
-				equal( typeof b.height, 'number' );
+				ok( b instanceof Ball, 'new instance is derived from the Ball constructor' );
+				ok( b.$ball.jquery, 'new instance uses the correct "$ball" property' );
+				strictEqual( b.speed, 1000, 'new instance uses the correct "speed" property' );
+				equal( typeof b.width, 'number', 'new instance uses the correct "width" property' );
+				equal( typeof b.height, 'number', 'new instance uses the correct "height" property' );
 			});
 		});
 
-		test( 'ball instance can start', function(){
+		test( 'When calling .start() on a new ball instance', function(){
 			testing.req.given( 'js/mods/ball', function ( Ball ) {
 				var b = new Ball( 1000, '#qunit-fixture' ),
 					duration = 500;
@@ -45,15 +45,15 @@
 				testing.sandbox.useFakeTimers();
 
 				b.start();
-				ok( b.$ball.is( ':animated' ) );
-				ok( ! b.isPaused );
-				ok( ! b.$ball.hasClass( 'is-paused' ) );
+				ok( b.$ball.is( ':animated' ), 'ball is being animated by jQuery' );
+				ok( ! b.isPaused, 'ball is not paused' );
+				ok( ! b.$ball.hasClass( 'is-paused' ), 'ball\'s markup does not have the "is-paused" class' );
 				b.stop();
 				testing.sandbox.clock.tick( duration * 2 );
 			});
 		});
 
-		test( 'ball instance can stop', function(){
+		test( 'when calling .stop() on a new ball instance', function(){
 			testing.req.given( 'js/mods/ball', function ( Ball ) {
 				var b = new Ball( 1000, '#qunit-fixture' ),
 					duration = 500;
@@ -65,13 +65,13 @@
 				b.stop();
 				testing.sandbox.clock.tick( duration * 2 );
 
-				ok( ! b.$ball.is( ':animated' ) );
-				ok( b.isPaused );
-				ok( b.$ball.hasClass( 'is-paused' ) );
+				ok( ! b.$ball.is( ':animated' ), 'ball is not being animated by jQuery' );
+				ok( b.isPaused, 'ball is paused' );
+				ok( b.$ball.hasClass( 'is-paused' ), 'ball\'s markup has the "is-paused" class' );
 			});
 		});
 
-		test( 'ball instance can move', function(){
+		test( 'when calling .move() on new ball instance', function(){
 			testing.req.given( 'js/mods/ball', function ( Ball ) {
 				var b = new Ball( 1000, '#qunit-fixture' ),
 					duration = 500;
@@ -79,8 +79,8 @@
 				testing.sandbox.useFakeTimers();
 
 				b.move();
-				ok( b.$ball.is( ':animated' ) );
-				ok( ! b.$ball.hasClass( 'is-paused' ) );
+				ok( b.$ball.is( ':animated' ), 'ball is being animated by jQuery' );
+				ok( ! b.$ball.hasClass( 'is-paused' ), 'ball\'s markup has the "is-paused" class' );
 				b.stop();
 				testing.sandbox.clock.tick( duration * 2 );
 			});
