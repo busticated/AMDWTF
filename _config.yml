@@ -1,0 +1,6 @@
+safe:        true
+source:      .
+destination: ./_site
+pygments:    true
+markdown:    maruku
+permalink:   date
