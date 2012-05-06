@@ -25,13 +25,13 @@ body {
 }
 .controls {
 	position: fixed;
-	bottom: 0;
+	top: 0;
 	left: 10px;
 	background: #333;
-	border-radius: 5px 5px 0 0;
+	border-radius: 0 0 5px 5px;
 	box-shadow: 0 0 5px rgba(0,0,0,0.7);
 	padding: 10px;
-	z-index: 9999;
+	z-index: 10;
 }
 .controls:hover ul {
 	display: block;
@@ -57,18 +57,27 @@ body {
 	text-decoration: none;
 }
 .dialog {
-	position: fixed;
-	bottom: 20px;
-	left: 100px;
-	background: #333;
-	border-radius: 5px;
-	box-shadow: 0 0 5px rgba(0,0,0,0.7);
-	padding: 10px;
-	z-index: 9999;
-	pointer-events: none;
-	opacity: 0;
-	-webkit-transition: opacity 0.5s ease;
-}
-.is-open {
-	opacity: 1;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin: -20px 0 0 -55px;
+    padding: 15px;
+    background: #333;
+    border-radius: 10px;
+    box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    -webkit-transition: opacity 0.15s ease;
+    pointer-events: none;
+    z-index: 20;
+
+    input {
+        width: 110px;
+        font-size: 34px;
+        height: 40px;
+    }
+
+    &.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
