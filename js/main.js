@@ -4,51 +4,11 @@ require.config({
     }
 });
 require( [ 'jquery', 'mods/arena', 'mods/configs' ], function( $, arena, configs ){
-    var ballCount = window.location.search.replace( '?balls=', '' );
-
-    configs.count = ballCount ? ballCount : configs.count;
-
-    if ( configs.count > 100 ){
-        configs.count = 100;
-    }
+    'use strict';
 
     $( document ).ready(function(){
-        arena.setup( configs );
-
-        $('#js-controls').on( 'click', '.control', function( e ){
-            e.preventDefault();
-            e.stopPropagation();
-            switch ( e.currentTarget.hash.replace( '#', '' ) ){
-                case 'stop':
-                    arena.stopGame();
-                    break;
-                case 'start':
-                    arena.startGame();
-                    break;
-                case 'halfspeed':
-                    arena.setSpeed( configs.speed * 2 );
-                    break;
-                case 'fullspeed':
-                    arena.setSpeed( configs.speed );
-                    break;
-                case 'dblspeed':
-                    arena.setSpeed( configs.speed / 2 );
-                    break;
-                case 'add':
-                    $( 'div.dialog' ).addClass( 'is-open' );
-                    $('#js-ballcount').focus();
-                    break;
-            }
-        });
-
-        $( '#js-ballcount' )
-            .on( 'keydown', function( e ){
-                if ( e.keyCode === 13 ){
-                    window.location.search = 'balls=' + $( this ).val();
-                }
-            })
-            .on( 'focusout', function( e ){
-                $( 'div.dialog' ).removeClass( 'is-open' );
-            });
+        if ( $('body').data('page') === 'demo' ){
+            arena.setup( configs ).listen();
+        }
     });
 });

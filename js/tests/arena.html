@@ -19,6 +19,7 @@
 			req.given('mods/arena', function( arena ) {
 				var expected = {
 					setup: 'function',
+					listen: 'function',
 					startGame: 'function',
 					stopGame: 'function',
 					setSpeed: 'function'
@@ -77,6 +78,37 @@
 				});
 
 				deepEqual( testing.fakeBall.callsToInit, expectedCallSig, 'correct number of balls are created' );
+			});
+		});
+
+		test( 'when calling .listen() to attach event listeners', function(){
+			testing.req.given( 'mods/arena', function( arena ) {
+				var configs = {
+					speed: 1000,
+					count: 3,
+					container: '#qunit-fixture',
+					controls: '#js-controls',
+					eventNamespace: '.arena'
+				};
+
+				arena.listen( configs );
+
+				var controls = $( configs.controls ).data('events');
+
+				ok( controls[ 'click' ].length, 'jQuery "click" event listener is attached' );
+				strictEqual( controls[ 'click' ][ 0 ][ 'namespace' ], configs.eventNamespace.replace( '.', '' ), 'jQuery "click" event uses correct namespace' );
+				strictEqual( controls[ 'click' ][ 0 ][ 'selector' ], '.control', 'jQuery "click" event uses correct selector' );
+				strictEqual( controls[ 'click' ][ 'delegateCount' ], 1, 'jQuery "click" event is delegated' );
+
+				ok( controls[ 'focusout' ].length, 'jQuery "focusout" event listener is attached' );
+				strictEqual( controls[ 'focusout' ][ 0 ][ 'namespace' ], configs.eventNamespace.replace( '.', '' ), 'jQuery "focusout" event uses correct namespace' );
+				strictEqual( controls[ 'focusout' ][ 0 ][ 'selector' ], 'input', 'jQuery "focusout" event uses correct selector' );
+				strictEqual( controls[ 'focusout' ][ 'delegateCount' ], 1, 'jQuery "focusout" event is delegated' );
+
+				ok( controls[ 'keydown' ].length, 'jQuery "keydown" event listener is attached' );
+				strictEqual( controls[ 'keydown' ][ 0 ][ 'namespace' ], configs.eventNamespace.replace( '.', '' ), 'jQuery "keydown" event uses correct namespace' );
+				strictEqual( controls[ 'keydown' ][ 0 ][ 'selector' ], 'input', 'jQuery "keydown" event uses correct selector' );
+				strictEqual( controls[ 'keydown' ][ 'delegateCount' ], 1, 'jQuery "keydown" event is delegated' );
 			});
 		});
 
@@ -189,6 +221,20 @@
 	<h2 id="qunit-userAgent"></h2>
 	<ol id="qunit-tests"></ol>
 	<div id="qunit-fixture">
+		<div id="js-controls" class="controls">
+			<span>+</span>
+			<ul>
+				<li><a href="#stop" class="control">stop</a></li>
+				<li><a href="#start" class="control">start</a></li>
+				<li><a href="#halfspeed" class="control">slow</a></li>
+				<li><a href="#fullspeed" class="control">normal</a></li>
+				<li><a href="#dblspeed" class="control">fast</a></li>
+				<li><a href="#add" class="control">add</a></li>
+			</ul>
+			<div class="dialog">
+				<input type="number" name="count" />
+			</div>
+		</div>
 	</div>
 </body>
 </html>
