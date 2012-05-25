@@ -2,3 +2,4 @@ safe:        true
 pygments:    true
 markdown:    maruku
 permalink:   date
+url: /AMDWTF

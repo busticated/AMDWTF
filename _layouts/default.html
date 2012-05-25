@@ -9,12 +9,12 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<meta name="description" content="">
 
-		<title>AMDWTF: Learning about AMD-style javascript modules &amp; the RequireJS toolkit</title>
-		<link rel="stylesheet" href="/css/main.css" />
-		<script src="/js/libs/modernizr.js"></script>
+		<title>{{ page.title }}</title>
+		<link rel="stylesheet" href="{{ site.url }}/css/main.css" />
+		<script src="{{ site.url }}/js/libs/modernizr.js"></script>
 	</head>
-	<body>
+	<body data-page="{{ page.name }}">
 		{{ content }}
-		<script data-main="/js/main" src="/js/libs/require.js"></script>
+		<script data-main="{{ site.url }}/js/main" src="{{ site.url }}/js/libs/require.js"></script>
 	</body>
 </html>
